@@ -6,19 +6,19 @@ import ProductListing from "./pages/ProductListing";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<ProductListing />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/cart" element={<Cart />} />
-      </Routes>
+      <div className="min-h-screen">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<ProductListing />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/cart" element={<Cart />} />
+        </Routes>
+      </div>
       <Footer />
     </BrowserRouter>
   );
 }
-
-export default App;

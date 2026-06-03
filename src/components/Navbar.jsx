@@ -1,98 +1,181 @@
-//Navbar.jsx
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logo from "../assets/assets/Layout/Brand/logo-colored.png";
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All category");
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter" && search.trim()) {
-      navigate(`/products?search=${search}`);
-    }
+  const handleSearch = () => {
+    if (search.trim()) navigate(`/products?search=${search}`);
   };
 
   return (
-    <nav className="bg-white shadow-sm px-6 md:px-16 py-4">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      {/* ROW 1 */}
+      <div className="px-6 md:px-10 py-3 flex items-center gap-4">
         {/* Logo */}
-        <Link to="/">
-          <img src={logo} alt="Shopcart" className="h-10" />
+        <Link to="/" className="flex items-center gap-2 min-w-fit">
+          <img src={logo} alt="Brand" className="h-8 w-8" />
+          <span className="text-blue-600 font-bold text-xl">Brand</span>
         </Link>
 
-        {/* Links - Desktop */}
-        <div className="hidden md:flex gap-8 text-gray-600 font-medium">
-          <Link to="/" className="hover:text-blue-700">
-            Home
+        {/* Search Bar */}
+        <div
+          className="flex-1 flex items-center border border-gray-300
+          rounded-md overflow-hidden max-w-2xl mx-auto"
+        >
+          <input
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="flex-1 px-4 py-2 text-sm focus:outline-none"
+          />
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="border-l border-gray-300 px-2 py-2 text-sm
+            text-gray-600 bg-gray-50 focus:outline-none hidden md:block"
+          >
+            <option>All category</option>
+            <option>Electronics</option>
+            <option>Clothing</option>
+            <option>Interior</option>
+          </select>
+          <button
+            onClick={handleSearch}
+            className="bg-blue-600 text-white px-5 py-2 text-sm
+            font-medium hover:bg-blue-700 transition"
+          >
+            Search
+          </button>
+        </div>
+
+        {/* Right Icons - Desktop */}
+        <div
+          className="hidden md:flex items-center gap-5
+          text-gray-500 text-xs min-w-fit"
+        >
+          <Link
+            to="/"
+            className="flex flex-col items-center hover:text-blue-600"
+          >
+            <span className="text-xl mb-0.5">👤</span>
+            <span>Profile</span>
           </Link>
-          <Link to="/products" className="hover:text-blue-700">
-            Products
+          <Link
+            to="/"
+            className="flex flex-col items-center hover:text-blue-600"
+          >
+            <span className="text-xl mb-0.5">💬</span>
+            <span>Message</span>
           </Link>
-          <Link to="/cart" className="hover:text-blue-700">
-            Cart
+          <Link
+            to="/"
+            className="flex flex-col items-center hover:text-blue-600"
+          >
+            <span className="text-xl mb-0.5">📋</span>
+            <span>Orders</span>
+          </Link>
+          <Link
+            to="/cart"
+            className="flex flex-col items-center hover:text-blue-600"
+          >
+            <span className="text-xl mb-0.5">🛒</span>
+            <span>My cart</span>
           </Link>
         </div>
 
-        {/* Search + Cart - Desktop */}
-        <div className="flex items-center gap-4">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={handleSearch}
-            className="hidden md:block border border-gray-300 rounded-full px-4 py-1 text-sm focus:outline-none focus:border-blue-500"
-          />
-          <Link to="/cart" className="text-2xl">
-            🛒
-          </Link>
+        {/* Mobile Hamburger */}
+        <button
+          className="md:hidden text-2xl text-gray-600"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
+      </div>
 
-          {/* Mobile Hamburger */}
+      {/* ROW 2 - Category Nav */}
+      <div
+        className="hidden md:flex items-center justify-between
+        border-t border-gray-100 px-10 py-2 text-sm text-gray-600"
+      >
+        <div className="flex items-center gap-6">
           <button
-            className="md:hidden text-2xl"
-            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex items-center gap-1
+            font-medium hover:text-blue-600"
           >
-            {menuOpen ? "✕" : "☰"}
+            ☰ All category
           </button>
+          <Link to="/" className="hover:text-blue-600">
+            Hot offers
+          </Link>
+          <Link to="/" className="hover:text-blue-600">
+            Gift boxes
+          </Link>
+          <Link to="/" className="hover:text-blue-600">
+            Projects
+          </Link>
+          <Link to="/" className="hover:text-blue-600">
+            Menu item
+          </Link>
+          <span className="hover:text-blue-600 cursor-pointer">Help ▾</span>
+        </div>
+        <div className="flex items-center gap-4 text-gray-400 text-xs">
+          <span>English, USD</span>
+          <span>🚢 Ship to 🇩🇪</span>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden mt-3 flex flex-col gap-3 px-4 pb-4 text-gray-600 font-medium">
+        <div
+          className="md:hidden flex flex-col gap-3
+          px-6 py-4 border-t text-gray-600 text-sm"
+        >
           <Link
             to="/"
             onClick={() => setMenuOpen(false)}
-            className="hover:text-blue-700"
+            className="hover:text-blue-600"
           >
             Home
           </Link>
           <Link
             to="/products"
             onClick={() => setMenuOpen(false)}
-            className="hover:text-blue-700"
+            className="hover:text-blue-600"
           >
             Products
           </Link>
           <Link
             to="/cart"
             onClick={() => setMenuOpen(false)}
-            className="hover:text-blue-700"
+            className="hover:text-blue-600"
           >
-            Cart
+            My Cart
           </Link>
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={handleSearch}
-            className="border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-          />
+          <div className="flex border rounded-md overflow-hidden">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="flex-1 px-3 py-2 text-sm focus:outline-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-blue-600 text-white px-3 text-sm"
+            >
+              Search
+            </button>
+          </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }
