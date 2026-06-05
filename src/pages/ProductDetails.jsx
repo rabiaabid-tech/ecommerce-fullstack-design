@@ -3,6 +3,23 @@ import { useState, useEffect } from "react";
 
 export default function ProductDetails() {
   const { id } = useParams();
+  const [toastMsg, setToastMsg] = useState("");
+  const handleAddToCart = () => {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingItem = cart.find((item) => item.id === product.id);
+
+    if (existingItem) {
+      setToastMsg("⚠️ This product exists in the cart already!");
+    } else {
+      cart.push({ ...product, qty: 1 });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      window.dispatchEvent(new Event("cartUpdated"));
+
+      setToastMsg("✅ Product successfully added to cart!");
+    }
+
+    setTimeout(() => setToastMsg(""), 3000);
+  };
 
   // Database states
   const [products, setProducts] = useState([]);
@@ -39,7 +56,7 @@ export default function ProductDetails() {
     );
   }
 
-  // Frontend filtering logic to mimic your static array behavior
+  // Frontend filtering logic to mimic static array behavior
   const product = products.find((p) => p.id === parseInt(id));
   const related = products.filter((p) => p.id !== parseInt(id)).slice(0, 6);
   const youMayLike = products.filter((p) => p.id !== parseInt(id)).slice(0, 5);
@@ -83,7 +100,6 @@ export default function ProductDetails() {
                   className="h-full w-full object-contain p-4 mix-blend-multiply"
                 />
               </div>
-              {/* Thumbnails (Mapped dummy array since DB has 1 image) */}
               <div className="flex gap-2 flex-wrap">
                 {[0, 1, 2, 3, 4, 5].map((i) => (
                   <div
@@ -211,6 +227,12 @@ export default function ProductDetails() {
                 </div>
                 <button className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium mb-2 hover:bg-blue-700">
                   Send inquiry
+                </button>
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium mb-2 hover:bg-blue-700"
+                >
+                  Add to Cart
                 </button>
                 <button className="w-full border border-blue-600 text-blue-600 py-2 rounded-lg text-sm hover:bg-blue-50">
                   Seller's profile
@@ -371,6 +393,12 @@ export default function ProductDetails() {
           </Link>
         </div>
       </div>
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed bottom-10 right-10 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce transition-all">
+          {toastMsg}
+        </div>
+      )}
     </div>
   );
 }

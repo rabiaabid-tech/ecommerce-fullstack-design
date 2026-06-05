@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logo from "../assets/assets/Layout/Brand/logo-colored.png";
 
 export default function Navbar() {
@@ -8,9 +8,24 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      setCartCount(cart.length);
+    };
+
+    updateCount();
+    window.addEventListener("cartUpdated", updateCount);
+    return () => window.removeEventListener("cartUpdated", updateCount);
+  }, []);
+
   const handleSearch = () => {
     if (search.trim()) navigate(`/products?search=${search}`);
   };
+
+  
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -83,10 +98,15 @@ export default function Navbar() {
           </Link>
           <Link
             to="/cart"
-            className="flex flex-col items-center hover:text-blue-600"
+            className="relative flex flex-col items-center hover:text-blue-600"
           >
             <span className="text-xl mb-0.5">🛒</span>
             <span>My cart</span>
+            {cartCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+            {cartCount}
+            </span>
+            )}
           </Link>
         </div>
 

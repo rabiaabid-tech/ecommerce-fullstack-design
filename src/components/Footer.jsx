@@ -97,7 +97,7 @@ export default function Footer() {
         className="border-t px-10 py-4 flex justify-between
         items-center text-xs text-gray-400"
       >
-        <span>© 2023 Ecommerce.</span>
+        <span>© 2026 Ecommerce.</span>
         <div className="flex items-center gap-1">
           <span>🇺🇸 English</span>
           <span>▲</span>

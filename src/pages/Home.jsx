@@ -1,23 +1,10 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+// Keep only static assets that don't belong in the product database
 import bannerImage from "../assets/assets/Image/backgrounds/Banner-board-800x420 2.png";
 import interior1 from "../assets/assets/Image/interior/1.png";
-import interior2 from "../assets/assets/Image/interior/3.png";
-import interior3 from "../assets/assets/Image/interior/6.png";
-import interior4 from "../assets/assets/Image/interior/7.png";
 import tech1 from "../assets/assets/Image/tech/image 23.png";
-import tech2 from "../assets/assets/Image/tech/image 29.png";
-import tech3 from "../assets/assets/Image/tech/image 34.png";
-import tech4 from "../assets/assets/Image/tech/image 32.png";
-import tech5 from "../assets/assets/Image/tech/image 33.png";
-import tech6 from "../assets/assets/Image/tech/image 85.png";
-import cloth1 from "../assets/assets/Layout/alibaba/Image/cloth/2 1.png";
-import cloth2 from "../assets/assets/Layout/alibaba/Image/cloth/image 24.png";
-import cloth3 from "../assets/assets/Layout/alibaba/Image/cloth/image 26.png";
-import cloth4 from "../assets/assets/Layout/alibaba/Image/cloth/image 30.png";
-
-// Flag images
 import aeFlag from "../assets/assets/Layout1/Image/flags/AE@2x.png";
 import usFlag from "../assets/assets/Layout1/Image/flags/US@2x.png";
 import gbFlag from "../assets/assets/Layout1/Image/flags/GB@2x.png";
@@ -57,17 +44,45 @@ function useCountdown() {
 export default function Home() {
   const time = useCountdown();
 
+  // Database State
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch all products on mount
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/products")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch");
+        return res.json();
+      })
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  // Filter products for specific sections based on database categories
+  const deals = products.slice(0, 5); // Take first 5 for deals
+  const interiors = products
+    .filter((p) => p.category === "Interior")
+    .slice(0, 8);
+  const electronics = products
+    .filter((p) => p.category === "Electronics")
+    .slice(0, 8);
+  const recommended = products.slice(0, 10); // Show latest 10
+
   return (
     <div style={{ backgroundColor: "#F7FAFC" }}>
       {/* ── SECTION 1: 3-Column Hero ── */}
       <section className="px-4 md:px-10 py-4">
         <div className="max-w-[1440px] mx-auto flex gap-3">
-          {/* Column 1: Category Sidebar */}
-          <div
-            className="hidden md:block w-48 bg-white
-            rounded-lg p-4 shadow-sm shrink-0"
-          >
-            <ul className="text-sm space-y-2 text-gray-600">
+          {/* Left Sidebar */}
+          <div className="hidden md:block w-64 bg-white border border-gray-200 rounded-lg p-3 shrink-0">
+            <ul className="text-sm space-y-1 text-gray-600">
               {[
                 "Automobiles",
                 "Clothes and wear",
@@ -77,110 +92,83 @@ export default function Home() {
                 "Sports and outdoor",
                 "Animal and pets",
                 "Machinery tools",
+                "More category",
               ].map((item, i) => (
                 <li
                   key={item}
-                  className={`cursor-pointer hover:text-blue-600 py-0.5
-                  ${i === 0 ? "text-blue-600 font-semibold" : ""}`}
+                  className={`cursor-pointer hover:bg-blue-50 px-3 py-2 rounded-md transition ${
+                    i === 0 ? "bg-blue-50 text-blue-700 font-medium" : ""
+                  }`}
                 >
                   {item}
                 </li>
               ))}
-              <li
-                className="text-blue-600 cursor-pointer
-                hover:underline pt-1"
-              >
-                More category
-              </li>
             </ul>
           </div>
 
-          {/* Column 2: Hero Banner */}
-          <div
-            className="flex-1 rounded-xl overflow-hidden
-            relative min-h-[200px]"
-          >
+          {/* Hero Banner */}
+          <div className="flex-1 rounded-xl overflow-hidden relative min-h-[300px]">
             <img
               src={bannerImage}
               alt="Hero"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                display: "block",
-              }}
+              className="w-full h-full object-cover block"
             />
-            <div className="absolute top-6 left-6">
-              <p className="text-gray-600 text-sm">Latest trending</p>
-              <h2
-                className="text-xl md:text-2xl font-bold
-                text-gray-800"
-              >
+            <div className="absolute top-10 left-10">
+              <p className="text-gray-800 text-lg mb-1">Latest trending</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 Electronic items
               </h2>
               <Link
                 to="/products"
-                className="inline-block mt-3 border border-gray-700
-                text-gray-700 px-4 py-1 rounded text-sm
-                hover:bg-gray-100 transition"
+                className="inline-block bg-white text-gray-800 font-medium px-5 py-2 rounded shadow-sm hover:bg-gray-50 transition"
               >
                 Learn more
               </Link>
             </div>
           </div>
 
-          {/* Column 3: Login + Offer boxes */}
-          <div className="hidden md:flex flex-col gap-2 w-44 shrink-0">
-            <div className="bg-white rounded-lg p-3 shadow-sm text-sm">
-              <p className="text-gray-600 text-xs mb-2">
-                Hi, user
-                <br />
-                <span className="font-semibold text-gray-800">
-                  let's get started
-                </span>
-              </p>
-              <button
-                className="w-full bg-blue-600 text-white
-                py-1.5 rounded mb-1.5 text-xs hover:bg-blue-700"
-              >
+          {/* Right Sidebar */}
+          <div className="hidden md:flex flex-col gap-3 w-56 shrink-0">
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
+                  <span className="text-xl text-white">👤</span>
+                </div>
+                <p className="text-gray-600 leading-tight">
+                  Hi, user
+                  <br />
+                  <span className="font-semibold text-gray-800">
+                    let's get started
+                  </span>
+                </p>
+              </div>
+              <button className="w-full bg-blue-600 text-white font-medium py-1.5 rounded mb-2 hover:bg-blue-700">
                 Join now
               </button>
-              <button
-                className="w-full border border-blue-600
-                text-blue-600 py-1.5 rounded text-xs hover:bg-blue-50"
-              >
+              <button className="w-full bg-white border border-gray-300 text-blue-600 font-medium py-1.5 rounded hover:bg-gray-50">
                 Log in
               </button>
             </div>
-            <div
-              className="bg-orange-400 text-white rounded-lg
-              p-3 text-xs leading-relaxed"
-            >
+            <div className="bg-orange-400 text-white rounded-lg p-4 text-sm leading-relaxed cursor-pointer hover:bg-orange-500 transition">
               Get US $10 off with a new supplier
             </div>
-            <div
-              className="bg-teal-500 text-white rounded-lg
-              p-3 text-xs leading-relaxed"
-            >
+            <div className="bg-teal-500 text-white rounded-lg p-4 text-sm leading-relaxed cursor-pointer hover:bg-teal-600 transition">
               Send quotes with supplier preferences
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 2: Deals & Offers ── */}
+      {/* ── SECTION 2: Deals & Offers (Figma Exact Match) ── */}
       <section className="px-4 md:px-10 py-4">
-        <div
-          className="max-w-[1440px] mx-auto bg-white
-          rounded-xl p-5 shadow-sm"
-        >
-          <div className="flex flex-wrap items-center gap-4 mb-4">
-            <div>
-              <p className="font-semibold text-gray-800">Deals and offers</p>
-              <p className="text-gray-400 text-xs">Hygiene equipments</p>
-            </div>
-            {/* Countdown */}
-            <div className="flex gap-2 ml-2">
+        <div className="max-w-[1440px] mx-auto border border-gray-200 bg-white rounded-xl overflow-hidden flex flex-col md:flex-row">
+          {/* Left Timer Pane */}
+          <div className="p-6 border-b md:border-b-0 md:border-r border-gray-200 w-full md:w-72 shrink-0">
+            <h3 className="font-bold text-gray-800 text-xl mb-1">
+              Deals and offers
+            </h3>
+            <p className="text-gray-500 text-sm mb-4">Hygiene equipments</p>
+            <div className="flex gap-1.5">
               {[
                 { n: String(time.days).padStart(2, "0"), l: "Days" },
                 { n: String(time.hours).padStart(2, "0"), l: "Hour" },
@@ -189,286 +177,197 @@ export default function Home() {
               ].map((t) => (
                 <div
                   key={t.l}
-                  className="bg-gray-800 text-white text-xs
-                  px-2 py-1 rounded text-center min-w-[40px]"
+                  className="bg-gray-600 text-white px-2 py-1.5 rounded text-center min-w-[45px]"
                 >
-                  <div className="font-bold text-sm">{t.n}</div>
-                  <div className="text-gray-400">{t.l}</div>
+                  <div className="font-bold text-base leading-none">{t.n}</div>
+                  <div className="text-[10px] mt-0.5 text-gray-200">{t.l}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {[
-              { name: "Smart watches", discount: "-25%", img: tech1 },
-              { name: "Laptops", discount: "-15%", img: tech2 },
-              { name: "GoPro cameras", discount: "-40%", img: tech3 },
-              { name: "Headphones", discount: "-25%", img: tech4 },
-              { name: "Canon cameras", discount: "-25%", img: tech5 },
-            ].map((p, i) => (
-              <Link
-                to={`/product/${i + 1}`}
-                key={p.name}
-                className="border rounded-xl p-3 text-center
-                hover:shadow-md transition block"
-              >
-                <img
-                  src={p.img}
-                  alt={p.name}
-                  className="h-20 mx-auto object-contain mb-2"
-                />
-                <p className="text-xs text-gray-700 mb-1">{p.name}</p>
-                <span
-                  className="bg-red-100 text-red-500
-                  text-xs px-2 py-0.5 rounded-full"
+          {/* Right Products Pane */}
+          <div className="flex-1 grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 border-gray-200">
+            {loading ? (
+              <p className="text-sm text-gray-500 p-6">Loading deals...</p>
+            ) : (
+              deals.map((p) => (
+                <Link
+                  to={`/product/${p.id}`}
+                  key={p.id}
+                  className="p-4 flex flex-col items-center hover:bg-gray-50 transition"
                 >
-                  {p.discount}
-                </span>
-              </Link>
-            ))}
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="h-28 w-28 object-contain mb-3 mix-blend-multiply"
+                  />
+                  <p className="text-sm text-gray-800 font-medium mb-1 text-center truncate w-full">
+                    {p.name}
+                  </p>
+                  <span className="bg-red-100 text-red-500 text-xs font-semibold px-3 py-1 rounded-full">
+                    {p.old_price
+                      ? `-${Math.round(((p.old_price - p.price) / p.old_price) * 100)}%`
+                      : "-15%"}
+                  </span>
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 3: Home and Outdoor ── */}
+      {/* ── SECTION 3: Home and Outdoor (Figma Exact Match) ── */}
       <section className="px-4 md:px-10 py-4">
-        <div
-          className="max-w-[1440px] mx-auto bg-white
-          rounded-xl p-5 shadow-sm flex gap-4"
-        >
-          {/* Left promo */}
-          <div
-            className="hidden md:flex flex-col justify-between
-            w-44 shrink-0 bg-amber-50 rounded-xl p-4"
-          >
-            <div>
-              <h3 className="font-bold text-gray-800 mb-1">Home and outdoor</h3>
-              <button
-                className="mt-3 border border-gray-600
-                text-gray-700 text-xs px-4 py-1.5 rounded
-                hover:bg-gray-100"
-              >
+        <div className="max-w-[1440px] mx-auto border border-gray-200 bg-white rounded-xl overflow-hidden flex flex-col md:flex-row">
+          {/* Left Promo Banner */}
+          <div className="hidden md:flex flex-col w-72 shrink-0 relative overflow-hidden bg-amber-50">
+            <div className="p-6 relative z-10">
+              <h3 className="font-bold text-gray-800 text-xl leading-tight mb-4">
+                Home and
+                <br />
+                outdoor
+              </h3>
+              <button className="bg-white border border-gray-300 shadow-sm text-gray-800 font-medium text-sm px-4 py-2 rounded hover:bg-gray-50">
                 Source now
               </button>
             </div>
+            {/* Absolute image placed at the bottom right of the block */}
             <img
               src={interior1}
               alt="Home"
-              className="h-24 object-contain mt-2"
+              className="absolute bottom-0 right-0 w-4/5 object-contain mix-blend-multiply opacity-90"
             />
           </div>
 
-          {/* Products grid */}
-          <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              {
-                id: 6,
-                name: "Soft chairs",
-                price: "From USD 19",
-                img: interior1,
-              },
-              {
-                id: 6,
-                name: "Sofa & chair",
-                price: "From USD 19",
-                img: interior2,
-              },
-              {
-                id: 7,
-                name: "Kitchen dishes",
-                price: "From USD 19",
-                img: interior3,
-              },
-              {
-                id: 2,
-                name: "Smart watches",
-                price: "From USD 19",
-                img: tech1,
-              },
-              {
-                id: 7,
-                name: "Kitchen mixer",
-                price: "From USD 100",
-                img: interior4,
-              },
-              { id: 7, name: "Blenders", price: "From USD 39", img: interior2 },
-              {
-                id: 6,
-                name: "Home appliance",
-                price: "From USD 19",
-                img: interior3,
-              },
-              {
-                id: 7,
-                name: "Coffee maker",
-                price: "From USD 10",
-                img: interior1,
-              },
-            ].map((p) => (
-              <Link
-                to={`/product/${p.id}`}
-                key={p.name}
-                className="flex items-center gap-3 p-2
-                hover:bg-gray-50 rounded-lg cursor-pointer"
-              >
-                <img
-                  src={p.img}
-                  alt={p.name}
-                  className="h-14 w-14 object-contain shrink-0"
-                />
-                <div>
-                  <p className="text-xs font-medium text-gray-700">{p.name}</p>
-                  <p className="text-xs text-gray-400">{p.price}</p>
-                </div>
-              </Link>
-            ))}
+          {/* Right Grid (Text Left, Image Right) */}
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+            {interiors.length === 0 && !loading ? (
+              <p className="text-sm text-gray-500 p-6">No interior products.</p>
+            ) : (
+              interiors.map((p) => (
+                <Link
+                  to={`/product/${p.id}`}
+                  key={p.id}
+                  className="border-b border-r border-gray-200 p-4 flex justify-between items-center hover:bg-gray-50 transition"
+                >
+                  <div className="flex flex-col pr-2 overflow-hidden">
+                    <span className="text-gray-800 font-medium text-sm truncate">
+                      {p.name}
+                    </span>
+                    <span className="text-gray-400 text-xs mt-1">
+                      From USD {p.price}
+                    </span>
+                  </div>
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="h-16 w-16 object-contain shrink-0 mix-blend-multiply"
+                  />
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 4: Consumer Electronics ── */}
+      {/* ── SECTION 4: Consumer Electronics (Figma Exact Match) ── */}
       <section className="px-4 md:px-10 py-4">
-        <div
-          className="max-w-[1440px] mx-auto bg-white
-          rounded-xl p-5 shadow-sm flex gap-4"
-        >
-          {/* Left promo */}
-          <div
-            className="hidden md:flex flex-col justify-between
-            w-44 shrink-0 bg-blue-50 rounded-xl p-4"
-          >
-            <div>
-              <h3 className="font-bold text-gray-800 mb-1 text-sm">
-                Consumer electronics and gadgets
+        <div className="max-w-[1440px] mx-auto border border-gray-200 bg-white rounded-xl overflow-hidden flex flex-col md:flex-row">
+          {/* Left Promo Banner */}
+          <div className="hidden md:flex flex-col w-72 shrink-0 relative overflow-hidden bg-blue-50">
+            <div className="p-6 relative z-10">
+              <h3 className="font-bold text-gray-800 text-xl leading-tight mb-4">
+                Consumer
+                <br />
+                electronics and
+                <br />
+                gadgets
               </h3>
-              <button
-                className="mt-3 border border-gray-600
-                text-gray-700 text-xs px-4 py-1.5 rounded
-                hover:bg-gray-100"
-              >
+              <button className="bg-white border border-gray-300 shadow-sm text-gray-800 font-medium text-sm px-4 py-2 rounded hover:bg-gray-50">
                 Source now
               </button>
             </div>
+            {/* Absolute image placed at the bottom right */}
             <img
               src={tech1}
-              alt="Electronics"
-              className="h-24 object-contain mt-2"
+              alt="Tech"
+              className="absolute bottom-0 right-0 w-4/5 object-contain mix-blend-multiply opacity-90"
             />
           </div>
 
-          {/* Products grid */}
-          <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              {
-                id: 2,
-                name: "Smart watches",
-                price: "From USD 19",
-                img: tech1,
-              },
-              { id: 3, name: "Cameras", price: "From USD 89", img: tech3 },
-              { id: 1, name: "Headphones", price: "From USD 70", img: tech4 },
-              {
-                id: 2,
-                name: "Premium Smart watches",
-                price: "From USD 90",
-                img: tech2,
-              }, 
-              { id: 5, name: "Gaming set", price: "From USD 35", img: tech5 },
-              {
-                id: 3,
-                name: "Laptops & PC",
-                price: "From USD 340",
-                img: tech2,
-              },
-              { id: 2, name: "Smartphones", price: "From USD 19", img: tech6 },
-              {
-                id: 4,
-                name: "Electric kettle",
-                price: "From USD 240",
-                img: tech3,
-              },
-            ].map((p) => (
-              <Link
-                to={`/product/${p.id}`}
-                key={p.name}
-                className="flex items-center gap-3 p-2
-                hover:bg-gray-50 rounded-lg cursor-pointer"
-              >
-                <img
-                  src={p.img}
-                  alt={p.name}
-                  className="h-14 w-14 object-contain shrink-0"
-                />
-                <div>
-                  <p className="text-xs font-medium text-gray-700">{p.name}</p>
-                  <p className="text-xs text-gray-400">{p.price}</p>
-                </div>
-              </Link>
-            ))}
+          {/* Right Grid (Text Left, Image Right) */}
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+            {electronics.length === 0 && !loading ? (
+              <p className="text-sm text-gray-500 p-6">No electronics.</p>
+            ) : (
+              electronics.map((p) => (
+                <Link
+                  to={`/product/${p.id}`}
+                  key={p.id}
+                  className="border-b border-r border-gray-200 p-4 flex justify-between items-center hover:bg-gray-50 transition"
+                >
+                  <div className="flex flex-col pr-2 overflow-hidden">
+                    <span className="text-gray-800 font-medium text-sm truncate">
+                      {p.name}
+                    </span>
+                    <span className="text-gray-400 text-xs mt-1">
+                      From USD {p.price}
+                    </span>
+                  </div>
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="h-16 w-16 object-contain shrink-0 mix-blend-multiply"
+                  />
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </section>
 
       {/* ── SECTION 5: Send Quote Banner ── */}
-      <section className="px-4 md:px-10 py-4">
-        <div
-          className="max-w-[1440px] mx-auto rounded-xl
-          overflow-hidden flex flex-col md:flex-row"
-        >
-          {/* Left blue */}
-          <div
-            className="flex-1 bg-blue-600 p-8 text-white
-            flex flex-col justify-center"
-          >
-            <h2 className="text-xl md:text-2xl font-bold mb-3">
+      <section className="px-4 md:px-10 py-6">
+        <div className="max-w-[1440px] mx-auto border border-gray-200 rounded-xl overflow-hidden flex flex-col md:flex-row relative">
+          {/* Blue Background Gradient mimicking image */}
+          <div className="flex-1 bg-gradient-to-r from-blue-600 to-blue-400 p-8 md:p-12 text-white flex flex-col justify-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 max-w-md">
               An easy way to send requests to all suppliers
             </h2>
-            <p className="text-blue-100 text-sm leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            <p className="text-blue-100 text-sm leading-relaxed max-w-sm mb-6">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
               eiusmod tempor incididunt.
             </p>
           </div>
 
-          {/* Right white form */}
-          <div className="bg-white p-6 w-full md:w-80 shrink-0">
-            <h3 className="font-semibold text-gray-800 mb-4">
+          {/* White Form Card overlapping the blue area slightly in exact Figma design */}
+          <div className="bg-white border border-gray-200 shadow-lg rounded-xl p-6 m-4 md:my-6 md:mr-6 md:-ml-8 w-full md:w-96 shrink-0 relative z-10">
+            <h3 className="font-bold text-gray-800 text-lg mb-4">
               Send quote to suppliers
             </h3>
-            <p className="text-sm text-gray-500 mb-1">What item you need?</p>
             <input
               type="text"
-              placeholder="Type item name"
-              className="w-full border border-gray-300 rounded
-              px-3 py-2 text-sm mb-3 focus:outline-none
-              focus:border-blue-500"
+              placeholder="What item you need?"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-3 focus:outline-none focus:border-blue-500"
             />
             <textarea
               placeholder="Type more details"
               rows={3}
-              className="w-full border border-gray-300 rounded
-              px-3 py-2 text-sm mb-3 focus:outline-none
-              focus:border-blue-500 resize-none"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-3 focus:outline-none focus:border-blue-500 resize-none"
             />
             <div className="flex gap-2 mb-4">
               <input
                 type="number"
                 placeholder="Quantity"
-                className="flex-1 border border-gray-300 rounded
-                px-3 py-2 text-sm focus:outline-none"
+                className="w-1/2 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none"
               />
-              <select
-                className="border border-gray-300 rounded
-                px-2 py-2 text-sm focus:outline-none"
-              >
+              <select className="w-1/2 border border-gray-300 rounded px-2 py-2 text-sm focus:outline-none bg-white">
                 <option>Pcs</option>
                 <option>Kg</option>
               </select>
             </div>
-            <button
-              className="w-full bg-blue-600 text-white
-              py-2 rounded font-medium text-sm hover:bg-blue-700"
-            >
+            <button className="bg-blue-600 text-white px-5 py-2 rounded font-medium text-sm hover:bg-blue-700">
               Send inquiry
             </button>
           </div>
@@ -478,129 +377,88 @@ export default function Home() {
       {/* ── SECTION 6: Recommended Items ── */}
       <section className="px-4 md:px-10 py-6">
         <div className="max-w-[1440px] mx-auto">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">
             Recommended items
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {[
-              {
-                name: "T-shirts with multiple colors",
-                price: "$10.30",
-                img: cloth1,
-              },
-              {
-                name: "Jeans shorts for men blue color",
-                price: "$10.30",
-                img: cloth2,
-              },
-              {
-                name: "Brown winter coat medium size",
-                price: "$12.50",
-                img: cloth3,
-              },
-              {
-                name: "Jeans bag for travel for men",
-                price: "$34.00",
-                img: cloth4,
-              },
-              { name: "Leather wallet", price: "$99.00", img: cloth1 },
-              {
-                name: "Canon camera black 100x zoom",
-                price: "$9.99",
-                img: tech3,
-              },
-              {
-                name: "Headset for gaming with mic",
-                price: "$8.99",
-                img: tech4,
-              },
-              {
-                name: "Smartwatch silver color modern",
-                price: "$10.30",
-                img: tech1,
-              },
-              {
-                name: "Blue wallet for men leather",
-                price: "$10.30",
-                img: cloth2,
-              },
-              {
-                name: "Jeans bag for travel for men",
-                price: "$80.95",
-                img: cloth3,
-              },
-            ].map((p, i) => (
-              <Link
-                to={`/product/${i + 1}`}
-                key={i}
-                className="bg-white border rounded-xl p-3
-                hover:shadow-md transition"
-              >
-                <div
-                  className="h-36 flex items-center
-                  justify-center mb-2"
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {loading ? (
+              <p className="text-sm text-gray-500">
+                Loading recommendations...
+              </p>
+            ) : (
+              recommended.map((p) => (
+                <Link
+                  to={`/product/${p.id}`}
+                  key={p.id}
+                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
                 >
-                  <img
-                    src={p.img}
-                    alt={p.name}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <p className="font-bold text-gray-800 text-sm">{p.price}</p>
-                <p className="text-gray-400 text-xs mt-1 leading-relaxed">
-                  {p.name}
-                </p>
-              </Link>
-            ))}
+                  <div className="h-40 flex items-center justify-center mb-3">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="max-h-full max-w-full object-contain mix-blend-multiply"
+                    />
+                  </div>
+                  <p className="font-bold text-gray-800 text-base mb-1">
+                    ${p.price}
+                  </p>
+                  <p className="text-gray-500 text-sm leading-snug line-clamp-2">
+                    {p.name} - {p.description}
+                  </p>
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 7: Extra Services ── */}
-      <section className="px-4 md:px-10 py-4">
+      {/* ── SECTION 7: Extra Services (Figma Exact Match) ── */}
+      <section className="px-4 md:px-10 py-6">
         <div className="max-w-[1440px] mx-auto">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">
             Our extra services
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {[
               {
                 title: "Source from Industry Hubs",
-                icon: "🏭",
+                icon: "🔍",
                 img: interior1,
               },
-              { title: "Customize Your Products", icon: "🎨", img: cloth1 },
+              { title: "Customize Your Products", icon: "📦", img: tech1 },
               {
                 title: "Fast, reliable shipping by ocean or air",
                 icon: "✈️",
-                img: tech2,
+                img: bannerImage,
               },
               {
                 title: "Product monitoring and inspection",
-                icon: "🔍",
-                img: tech3,
+                icon: "🛡️",
+                img: interior1,
               },
-            ].map((s) => (
+            ].map((s, i) => (
               <div
-                key={s.title}
-                className="relative rounded-xl overflow-hidden
-                h-36 cursor-pointer group"
+                key={i}
+                className="border border-gray-200 bg-white rounded-xl overflow-hidden hover:shadow-md transition cursor-pointer relative"
               >
-                <img
-                  src={s.img}
-                  alt={s.title}
-                  className="w-full h-full object-cover"
-                />
-                <div
-                  className="absolute inset-0 bg-black
-                  bg-opacity-40 group-hover:bg-opacity-50
-                  transition"
-                />
-                <div className="absolute bottom-3 left-3 text-white">
-                  <span className="text-xl">{s.icon}</span>
-                  <p className="text-xs font-medium mt-1 leading-tight">
+                {/* Top Half: Image */}
+                <div className="h-32 bg-gray-100 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-black bg-opacity-30 mix-blend-multiply z-10" />
+                  <img
+                    src={s.img}
+                    alt={s.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Bottom Half: Text */}
+                <div className="p-5 relative">
+                  {/* Floating Circular Icon */}
+                  <div className="absolute -top-7 right-5 w-14 h-14 bg-blue-100 border-4 border-white rounded-full flex items-center justify-center text-xl shadow-sm z-20">
+                    {s.icon}
+                  </div>
+                  <h4 className="font-medium text-gray-800 text-base leading-tight pr-10 w-4/5">
                     {s.title}
-                  </p>
+                  </h4>
                 </div>
               </div>
             ))}
@@ -609,38 +467,38 @@ export default function Home() {
       </section>
 
       {/* ── SECTION 8: Suppliers by Region ── */}
-      <section className="px-4 md:px-10 py-6">
-        <div
-          className="max-w-[1440px] mx-auto bg-white
-          rounded-xl p-6 shadow-sm"
-        >
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      <section className="px-4 md:px-10 pb-12 pt-4">
+        <div className="max-w-[1440px] mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">
             Suppliers by region
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[
               { name: "Arabic Emirates", domain: "shopname.ae", flag: aeFlag },
+              { name: "Australia", domain: "shopname.au", flag: aeFlag },
               { name: "United States", domain: "shopname.us", flag: usFlag },
-              { name: "Great Britain", domain: "shopname.co.uk", flag: gbFlag },
-              { name: "China", domain: "shopname.ae", flag: cnFlag },
-              { name: "Germany", domain: "shopname.de", flag: deFlag },
+              { name: "Russia", domain: "shopname.ru", flag: usFlag },
+              { name: "Italy", domain: "shopname.it", flag: frFlag },
+              { name: "Denmark", domain: "denmark.com.dk", flag: deFlag },
               { name: "France", domain: "shopname.com.fr", flag: frFlag },
-              { name: "Australia", domain: "shopname.ae", flag: aeFlag },
-              { name: "Russia", domain: "shopname.ae", flag: usFlag },
-            ].map((s) => (
+              { name: "Arabic Emirates", domain: "shopname.ae", flag: aeFlag },
+              { name: "China", domain: "shopname.ae", flag: cnFlag },
+              { name: "Great Britain", domain: "shopname.co.uk", flag: gbFlag },
+            ].map((s, i) => (
               <div
-                key={s.name}
-                className="flex items-center gap-3
-                cursor-pointer hover:bg-gray-50 p-2 rounded-lg"
+                key={i}
+                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 py-2 rounded transition"
               >
                 <img
                   src={s.flag}
                   alt={s.name}
-                  className="w-8 h-6 object-cover rounded"
+                  className="w-7 h-5 object-cover rounded shadow-sm"
                 />
                 <div>
-                  <p className="text-sm font-medium text-gray-700">{s.name}</p>
-                  <p className="text-xs text-gray-400">{s.domain}</p>
+                  <p className="text-sm font-medium text-gray-700 leading-none mb-1">
+                    {s.name}
+                  </p>
+                  <p className="text-[11px] text-gray-500">{s.domain}</p>
                 </div>
               </div>
             ))}
