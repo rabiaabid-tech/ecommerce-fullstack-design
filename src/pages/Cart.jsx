@@ -25,7 +25,7 @@ export default function Cart() {
     }
 
     // 2. Fetch "Saved for later" items from backend dynamically
-    fetch(`${process.env.REACT_APP_API_URL}/products`)
+    fetch(`${process.env.REACT_APP_API_URL}/products/`)
       .then((res) => res.json())
       .then((data) => {
         setSavedItems(data.slice(0, 4)); // Show only 4 items
