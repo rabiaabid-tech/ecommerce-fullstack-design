@@ -68,7 +68,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/products")
+    fetch(`${process.env.REACT_APP_API_URL}/products`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();

@@ -32,7 +32,7 @@ export default function ProductListing() {
 
   // ── count the total items ──
   useEffect(() => {
-    let countUrl = `http://127.0.0.1:8000/products?skip=0&limit=1000`;
+    let countUrl = `${process.env.REACT_APP_API_URL}/products?skip=0&limit=1000`;
     if (search) countUrl += `&search=${encodeURIComponent(search)}`;
     if (activeCategory !== "All")
       countUrl += `&category=${encodeURIComponent(activeCategory)}`;
@@ -48,7 +48,7 @@ export default function ProductListing() {
     setLoading(true);
     const skip = (currentPage - 1) * itemsPerPage;
 
-    let apiUrl = `http://127.0.0.1:8000/products?skip=${skip}&limit=${itemsPerPage}`;
+    let apiUrl = `${process.env.REACT_APP_API_URL}/products?skip=${skip}&limit=${itemsPerPage}`;
 
     if (search) apiUrl += `&search=${encodeURIComponent(search)}`;
     if (activeCategory !== "All")

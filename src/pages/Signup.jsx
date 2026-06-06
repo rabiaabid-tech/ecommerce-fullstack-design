@@ -37,7 +37,7 @@ export default function Signup() {
 
     try {
       // 1. Signup API Call
-      const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -61,7 +61,7 @@ export default function Signup() {
       loginPayload.append("username", formData.email);
       loginPayload.append("password", formData.password);
 
-      const loginRes = await fetch("http://127.0.0.1:8000/auth/login", {
+      const loginRes = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: loginPayload.toString(),

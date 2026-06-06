@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   // READ: Fetch all products
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/products/");
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/');
       if (res.ok) {
         const data = await res.json();
         setProducts(data);
@@ -55,8 +55,8 @@ export default function AdminDashboard() {
 
     try {
       const url = editingId
-        ? `http://127.0.0.1:8000/products/${editingId}`
-        : "http://127.0.0.1:8000/products/";
+        ? `${process.env.REACT_APP_API_URL}/products/${editingId}`
+        : `${process.env.REACT_APP_API_URL}/products/`;
 
       const method = editingId ? "PUT" : "POST";
 
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/products/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`, // 🔒 GUARD
