@@ -68,6 +68,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    console.log("Checking API URL:", process.env.REACT_APP_API_URL);
     fetch(`${process.env.REACT_APP_API_URL}/products/`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
@@ -77,7 +78,10 @@ export default function Home() {
         setProducts(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error("Fetch failed:", err);
+        setLoading(false);
+      });
   }, []);
 
   const deals = products.slice(0, 5);
