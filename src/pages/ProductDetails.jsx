@@ -32,7 +32,7 @@ export default function ProductDetails() {
   // Fetch all products to populate main detail AND related sidebars
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.REACT_APP_API_URL}/products/`)
+    fetch(`${process.env.REACT_APP_API_URL}/products/?limit=100`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch products");
         return res.json();

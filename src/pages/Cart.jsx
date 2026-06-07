@@ -8,21 +8,13 @@ export default function Cart() {
 
   // 1. Load Cart Data from LocalStorage
   useEffect(() => {
-    //check token exists or not, if not then clear cart
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setCartItems([]);
-      localStorage.removeItem("cart");
-      window.dispatchEvent(new Event("cartUpdated"));
-    } else {
-     //if token exists, load cart items (with qty) from localStorage
-      const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const cartWithQty = savedCart.map((item) => ({
-        ...item,
-        qty: item.qty || 1,
-      }));
-      setCartItems(cartWithQty);
-    }
+    // 1. Load cart items from localStorage ALWAYS, regardless of login status
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartWithQty = savedCart.map((item) => ({
+      ...item,
+      qty: item.qty || 1,
+    }));
+    setCartItems(cartWithQty);
 
     // 2. Fetch "Saved for later" items from backend dynamically
     fetch(`${process.env.REACT_APP_API_URL}/products/`)
@@ -36,6 +28,7 @@ export default function Cart() {
         setLoadingSaved(false);
       });
   }, []);
+
 
   // Update Quantity Logic
   const handleQtyChange = (id, newQty) => {

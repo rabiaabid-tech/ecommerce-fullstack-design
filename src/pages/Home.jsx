@@ -69,7 +69,7 @@ export default function Home() {
 
   useEffect(() => {
     console.log("Checking API URL:", process.env.REACT_APP_API_URL);
-    fetch(`${process.env.REACT_APP_API_URL}/products/`)
+    fetch(`${process.env.REACT_APP_API_URL}/products/?limit=100`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();
