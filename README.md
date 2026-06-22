@@ -1,7 +1,6 @@
 # Full-Stack E-Commerce Web Application
 
-**University of Gujrat** | **BS Information Technology**
-**Submitted By:** Rabia Abid 
+**DevelopersHub Corporation** |**Submitted By:** Rabia Abid 
 
 ## Project Overview
 This is a full-stack e-commerce web application featuring a modern, responsive user interface and a robust, optimized backend REST API. It includes product browsing, dynamic filtering by category, cart management via local storage, and secure user authentication.
