@@ -48,7 +48,7 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <img src={logo} alt="Brand" className="h-7 w-7 md:h-8 md:w-8" />
           <span className="text-blue-600 font-bold text-lg md:text-xl">
-            Brand
+            TradeGrid
           </span>
         </Link>
 
